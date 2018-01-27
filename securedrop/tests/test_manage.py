@@ -8,11 +8,11 @@ from sdconfig import config
 import logging
 import manage
 import mock
+import pytest
 from sqlalchemy.orm.exc import NoResultFound
 from StringIO import StringIO
 import sys
 import time
-import unittest
 import utils
 
 import journalist_app
@@ -44,15 +44,14 @@ class TestManagePy(object):
         assert 'VISIBLE' in caplog.text
 
 
-class TestManagementCommand(unittest.TestCase):
-
-    def setUp(self):
+class TestManagementCommand(object):
+    def setup(self):
         self.__context = journalist_app.create_app(config).app_context()
         self.__context.push()
         utils.env.setup()
         self.__context.pop()
 
-    def tearDown(self):
+    def teardown(self):
         self.__context.push()
         utils.env.teardown()
         self.__context.pop()
@@ -84,9 +83,9 @@ class TestManagementCommand(unittest.TestCase):
 
         # We will try to provide one invalid and one valid secret
         return_value = manage._add_user()
-        self.assertEqual(return_value, 0)
-        self.assertIn('Try again.', sys.stdout.getvalue())
-        self.assertIn('successfully added', sys.stdout.getvalue())
+        assert return_value == 0
+        assert 'Try again.' in sys.stdout.getvalue()
+        assert 'successfully added' in sys.stdout.getvalue()
 
     @mock.patch("manage._get_username", return_value='foo-bar-baz')
     @mock.patch("manage._get_yubikey_usage", return_value=False)
@@ -99,14 +98,14 @@ class TestManagementCommand(unittest.TestCase):
 
         # Inserting the user for the first time should succeed
         return_value = manage._add_user()
-        self.assertEqual(return_value, 0)
-        self.assertIn('successfully added', sys.stdout.getvalue())
+        assert return_value == 0
+        assert 'successfully added' in sys.stdout.getvalue()
 
         # Inserting the user for a second time should fail
         return_value = manage._add_user()
-        self.assertEqual(return_value, 1)
-        self.assertIn('ERROR: That username is already taken!',
-                      sys.stdout.getvalue())
+        assert return_value == 1
+        assert ('ERROR: That username is already taken!' in
+                sys.stdout.getvalue())
 
     @mock.patch("manage._get_username", return_value='test-user-56789')
     @mock.patch("manage._get_yubikey_usage", return_value=False)
@@ -119,10 +118,10 @@ class TestManagementCommand(unittest.TestCase):
                          mock_user_to_delete,
                          mock_user_del_confirm):
         return_value = manage._add_user()
-        self.assertEqual(return_value, 0)
+        assert return_value == 0
 
         return_value = manage.delete_user(args=None)
-        self.assertEqual(return_value, 0)
+        assert return_value == 0
 
     @mock.patch("manage._get_username_to_delete",
                 return_value='does-not-exist')
@@ -133,28 +132,30 @@ class TestManagementCommand(unittest.TestCase):
                                       mock_user_del_confirm,
                                       mock_stdout):
         return_value = manage.delete_user(args=None)
-        self.assertEqual(return_value, 0)
-        self.assertIn('ERROR: That user was not found!',
-                      sys.stdout.getvalue())
+        assert return_value == 0
+        assert ('ERROR: That user was not found!' in
+                sys.stdout.getvalue())
 
     @mock.patch("__builtin__.raw_input", return_value='test-user-12345')
     def test_get_username_to_delete(self, mock_username):
         return_value = manage._get_username_to_delete()
-        self.assertEqual(return_value, 'test-user-12345')
+        assert return_value == 'test-user-12345'
 
     def test_reset(self):
         test_journalist, _ = utils.db_helper.init_journalist()
         user_should_be_gone = test_journalist.username
 
-        return_value = manage.reset(args=None)
+        args = argparse.Namespace(store_dir=config.STORE_DIR,
+                                  verbose=logging.DEBUG)
+        return_value = manage.reset(args)
 
-        self.assertEqual(return_value, 0)
+        assert return_value == 0
         assert os.path.exists(config.DATABASE_FILE)
         assert os.path.exists(config.STORE_DIR)
 
         # Verify journalist user present in the database is gone
         db.session.remove()  # Close session and get a session on the new db
-        with self.assertRaises(NoResultFound):
+        with pytest.raises(NoResultFound):
             Journalist.query.filter_by(username=user_should_be_gone).one()
 
 
