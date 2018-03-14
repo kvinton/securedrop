@@ -76,3 +76,15 @@ def test_swap_disabled(Command):
     # Expect that ONLY the headers will be present in the output.
     rgx = re.compile("Filename\s*Type\s*Size\s*Used\s*Priority")
     assert re.search(rgx, c)
+
+def test_vanilla_kernel_removed(Command, File, Sudo):
+    """
+    Test that there are no vanilla kernels present on the system. All
+    vanilla kernels should be removed at install-time.
+    """
+    with Sudo():
+        c = Command.check_output(
+            "dpkg-query -f '${Package} ${Status}\n' -W 'linux-image*' |\
+            awk '$NF == \"installed\"{print $1}'")
+        for line in c.split('\n'):
+            assert "-grsec" in line
