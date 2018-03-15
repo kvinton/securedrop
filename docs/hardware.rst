@@ -33,6 +33,17 @@ These are the core components of a SecureDrop instance.
 * *Network Firewall*: 1 physical computer that is used as a dedicated firewall
   for the SecureDrop servers.
 
+SecureDrop Application and Monitor Servers require Ubuntu 14.04 (Trusty)
+with custom grsecurity-hardened 4.4 kernels. As such, hardware support should
+be identical Ubuntu 14.04.5 and Linux Kernel 4.4 hardware support.
+
+Hardware that relies on binary firmware blobs (for network adapter or storage
+driver support) are **very strongly discouraged** for both security and
+compatibility reasons. As general-purpose hardware has often less components
+and usually offers better non-proprietary driver support, we strongly recommend
+the us of off-the-shelf hardware listed in our
+:ref:`Specific Hardware Recommendations` section below.
+
 An acceptable alternative that requires more technical expertise is
 to :doc:`configure an existing hardware firewall <network_firewall>`.
 
