@@ -1,0 +1,21 @@
+---
+securedrop_firmware_version: 0.0.1
+linux_firmware_git: git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+build_path: /tmp/build/securedrop-firmware
+package_path: /tmp/securedrop-firmware-{{ securedrop_firmware_version }}+{{ securedrop_app_code_version }}-amd64
+firmware_path: /lib/firmware/
+securedrop-firmware_build_deb_package_local_dest_dir: "../../build/"
+securedrop-firmware_rsync_opts:
+  - "--chmod=u=rwX,g=rX,o=rX"
+  - "--chown=root:root"
+  - "--exclude=*.deb"
+
+blobs:
+  bnx2:
+    name: Broadcom NetXtremeII
+    path: "bnx2/bnx2-mips-09-6.2.1b.fw"
+    sha256: "88a0da6d4b22bc3011e9e08e35f1746e44a0fff910f33f371477983b3a115b47"
+  tg3:
+    name: Broadcom BCM5701A0
+    path: "tigon/tg3.bin"
+    sha256: "8c2d7ba213e319b88d047fbaa218c9e5d974c8ec1931865580aa120aa59541fa"

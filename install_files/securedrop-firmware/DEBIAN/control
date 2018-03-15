@@ -1,0 +1,12 @@
+Source: fpf
+Section: web
+Priority: optional
+Maintainer: SecureDrop Team <securedrop@freedom.press>
+Homepage: https://securedrop.org
+Package: securedrop-firmware
+Version: 0.0.1+0.6
+Architecture: amd64
+Homepage: https://git.kernel.org/cgit/linux/kernel/git/firmware/linux-firmware.git
+Description: This package contains the binary firmware for for the following
+ network devices:
+  * Broadcom NetXtremeII (bnx2/bnx2-mips-09-6.2.1b.fw)

@@ -1,0 +1,18 @@
+---
+- block:
+  - name: Check SHA256sums
+    shell: "sha256sum {{ build_path }}/linux-firmware/{{ item.value.path }} | grep {{ item.value.sha256}}"
+    with_dict: "{{ blobs }}"
+
+  - name: Create folders for all blobs
+    file: path={{ package_path }}{{ firmware_path }}/{{ item.value.path | dirname }} state=directory
+    with_dict: "{{ blobs }}"
+
+  - name: Move blobs over to firmware folder specific blobs to firmware folder for building
+    copy:
+      src: "{{ build_path }}/linux-firmware/{{ item.value.path}}"
+      remote_src: True
+      dest: "{{ package_path }}{{ firmware_path }}/{{ item.value.path | basename }}"
+      owner: root
+      mode: 644
+    with_dict: "{{ blobs }}"

@@ -1,0 +1,18 @@
+---
+- block:
+  - name: Create src path folders
+    file:
+      state: directory
+      path: "{{ item }}"
+    with_items:
+      - "{{ package_path }}"
+      - "{{ build_path }}"
+  - git:
+      repo: "{{ linux_firmware_git }}"
+      dest: "{{ build_path }}/linux-firmware"
+      version: master
+
+  - name: Create lib/firmware directory in build path.
+    file:
+      state: directory
+      dest: "{{ package_path }}{{ firmware_path }}"
